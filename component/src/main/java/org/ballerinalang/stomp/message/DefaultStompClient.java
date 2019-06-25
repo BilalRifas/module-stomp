@@ -16,12 +16,10 @@
  * under the License.
  */
 
-package org.ballerinalang.stomp.message;
+package org.ballerinalang.stdlib.stomp.message;
 
 import org.ballerinalang.bre.Context;
 import org.ballerinalang.bre.bvm.CallableUnitCallback;
-import org.ballerinalang.jvm.Strand;
-import org.ballerinalang.jvm.values.MapValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +36,6 @@ public class DefaultStompClient extends StompListener {
     private CallableUnitCallback callableUnit;
     private CountDownLatch connectDownLatch;
     private Context context;
-    private Strand strand;
-    private MapValue<String, Object> startConfig;
 
     public DefaultStompClient(URI uri) {
         super(uri);
@@ -58,13 +54,13 @@ public class DefaultStompClient extends StompListener {
         this.connectDownLatch = countDownLatch;
     }
 
-    public void setCallableUnit(Strand strand) {
-        this.strand = strand;
+    public void setCallableUnit(CallableUnitCallback callableUnit) {
+        this.callableUnit = callableUnit;
     }
 
     @Override
     public void onMessage(String messageId, String body, String destination, String replyToDestination) {
-        StompDispatcher.execute(this.startConfig);
+        StompDispatcher.execute(this.context);
         StompDispatcher.executeOnMessage(messageId, body, destination, replyToDestination);
     }
 
@@ -78,7 +74,7 @@ public class DefaultStompClient extends StompListener {
         // It's not implemented in Ballerina yet.
     }
 
-    public void setContext(MapValue<String, Object> startConfig) {
-        this.startConfig = startConfig;
+    public void setContext(Context context) {
+        this.context = context;
     }
 }

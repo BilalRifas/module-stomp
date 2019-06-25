@@ -9,7 +9,7 @@ This connector is compatible with Stomp 1.2 version.
 Following is a simple service (stompService) which is subscribed to queue 'test-stomp' on remote Stomp specific broker. In this example, acknowledgement is done automatically inside the resource by setting property `ackMode: stomp:AUTO` at service config.
 
 ```ballerina
-import ballerina/stomp;
+import wso2/stomp;
 import ballerina/log;
 
 listener stomp:Listener consumerEndpoint = new({
@@ -47,7 +47,7 @@ service stompListenerSports on consumerEndpoint  {
 Following example demonstrates a way to publish a message to a specified queue. A Stomp message is created from string, and then it is published to queue 'test-stomp' in remote Stomp specific broker.
 
 ```ballerina
-import ballerina/stomp;
+import wso2/stomp;
 
 stomp:Sender stompSender = new({
         host: "localhost",

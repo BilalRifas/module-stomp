@@ -52,10 +52,8 @@ public type Listener object {
 public type StompServiceConfig record {
     string destination = "";
     AckType ackMode = AUTO;
-    // TODO durable true flag need to be set internally
     boolean durable = false;
-    // TODO only use durableId for Durable subscribe
-    string durableId?;
+    string durableId = "";
 };
 
 public annotation<service> ServiceConfig StompServiceConfig;

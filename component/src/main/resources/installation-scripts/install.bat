@@ -34,14 +34,14 @@ IF NOT EXIST "%BALLERINA_HOME%/bin/ballerina.bat" (
 SET ballerina_lib_location=%ballerina_home%bre\lib
 SET ballerina_balo_location=%ballerina_home%lib\repo
 SET version=${project.version}
-SET module_name=kafka
-SET fileNamePattern=wso2-kafka-*-*.*.*.jar
+SET module_name=stomp
+SET fileNamePattern=wso2-stomp-*-*.*.*.jar
 SET /a id=1
 SET /a index=1
 
 IF EXIST "%ballerina_lib_location%\%fileNamePattern%" (
     SET file="%ballerina_lib_location%\%fileNamePattern%";
-    ECHO [WARNING] Another version of Kafka module is already installed.
+    ECHO [WARNING] Another version of Stomp module is already installed.
     SET /P response="Do you want to uninstall the previous version and continue installation? (Y/N): "
 )
 
@@ -66,13 +66,13 @@ IF EXIST "%ballerina_lib_location%\%fileNamePattern%" (
                 ECHO [WARNING] An error occurred while deleting %ballerina_balo_location%wso2\%module_name%\0.0.0\%module_name%.zip
                 GOTO :FAILED_BALO_DELETION
             ) ELSE (
-                ECHO [INFO] Successfully uninstalled existing Kafka package: !filename[%index%]!.jar
+                ECHO [INFO] Successfully uninstalled existing Stomp package: !filename[%index%]!.jar
             )
             SET /a index+=1
         )
     ) ELSE (
         IF "%response%"=="N" (
-            ECHO [ERROR] Another version of Kafka module already exists. Please remove it before install another version.
+            ECHO [ERROR] Another version of Stomp module already exists. Please remove it before install another version.
             GOTO :END
         ) ELSE (
             ECHO [ERROR] Invalid option provided.
@@ -128,7 +128,7 @@ IF %ERRORLEVEL% GTR 0 (
 )
 
 :SUCCESS
-ECHO [INFO] Successfully installed Kafka module: wso2-%module_name%-module-%version%!
+ECHO [INFO] Successfully installed Stomp module: wso2-%module_name%-module-%version%!
 GOTO :END
 
 :FAILED

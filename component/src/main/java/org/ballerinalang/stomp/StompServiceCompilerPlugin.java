@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.ballerinalang.stomp;
+package org.ballerinalang.stdlib.stomp;
 
 import org.ballerinalang.model.tree.AnnotationAttachmentNode;
 import org.ballerinalang.model.tree.ServiceNode;

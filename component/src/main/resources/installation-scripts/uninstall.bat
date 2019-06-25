@@ -34,11 +34,11 @@ IF NOT EXIST "%BALLERINA_HOME%/bin/ballerina.bat" (
 SET ballerina_lib_location=%ballerina_home%\bre\lib\
 SET ballerina_balo_location=%ballerina_home%\lib\repo\
 SET version=${project.version}
-SET module_name=kafka
+SET module_name=stomp
 
 IF NOT EXIST "%ballerina_lib_location%\wso2-%module_name%-module-%version%.jar" (
     IF NOT EXIST "%ballerina_balo_location%\wso2\%module_name%\0.0.0\%module_name%.zip" (
-	   ECHO [WARNING] Kafka module is not installed!
+	   ECHO [WARNING] Stomp module is not installed!
 	   GOTO :END
 	)
 )
@@ -60,7 +60,7 @@ IF EXIST "%ballerina_balo_location%\wso2\%module_name%\0.0.0\%module_name%.zip" 
 )
 
 :SUCCESS
-ECHO [INFO] Successfully uninstalled Kafka module: wso2-%module_name%-module-%version%!
+ECHO [INFO] Successfully uninstalled Stomp module: wso2-%module_name%-module-%version%!
 GOTO :END
 
 :FAILED_JAR_DELETION

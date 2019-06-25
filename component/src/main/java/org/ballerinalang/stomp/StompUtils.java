@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stomp;
+package org.ballerinalang.stdlib.stomp;
 
 import org.ballerinalang.bre.Context;
 import org.ballerinalang.bre.bvm.BLangVMErrors;

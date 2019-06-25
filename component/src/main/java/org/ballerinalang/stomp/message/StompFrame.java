@@ -1,4 +1,4 @@
-package org.ballerinalang.stomp.message;
+package org.ballerinalang.stdlib.stomp.message;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;

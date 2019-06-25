@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stomp;
+package org.ballerinalang.stdlib.stomp;
 
 /**
  * Stomp constants.
@@ -45,7 +45,6 @@ public class StompConstants {
     public static final String MSG_CONTENT_NAME = "content";
     public static final String REPLY_TO_DESTINATION = "destination";
     public static final String STOMP_MSG = "STOMPMSG";
-    public static final String SERVICE_CONFIG = "ServiceConfig";
     public static final String MSG_ID = "id";
     public static final String MESSAGE_OBJ = "Message";
     public static final String ACK_MODE = "ack-mode";

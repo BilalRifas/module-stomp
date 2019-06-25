@@ -1,4 +1,4 @@
-package org.ballerinalang.stomp.message;
+package org.ballerinalang.stdlib.stomp.message;
 
 import org.ballerinalang.bre.Context;
 import org.ballerinalang.bre.bvm.BLangVMErrors;
@@ -11,16 +11,12 @@ import org.ballerinalang.connector.api.ParamDetail;
 import org.ballerinalang.connector.api.Resource;
 import org.ballerinalang.connector.api.Service;
 import org.ballerinalang.connector.api.Struct;
-import org.ballerinalang.jvm.types.AttachedFunction;
-import org.ballerinalang.jvm.values.ArrayValue;
-import org.ballerinalang.jvm.values.MapValue;
-import org.ballerinalang.jvm.values.ObjectValue;
 import org.ballerinalang.model.values.BError;
 import org.ballerinalang.model.values.BMap;
 import org.ballerinalang.model.values.BString;
 import org.ballerinalang.model.values.BValue;
 import org.ballerinalang.services.ErrorHandlerUtils;
-import org.ballerinalang.stomp.StompConstants;
+import org.ballerinalang.stdlib.stomp.StompConstants;
 import org.ballerinalang.util.codegen.ProgramFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,23 +32,21 @@ import java.util.Map;
  */
 public class StompDispatcher {
     private static final Logger log = LoggerFactory.getLogger(StompDispatcher.class);
-    private static Map<String, ObjectValue> serviceRegistry = new HashMap<>();
-    private static Map<String, AttachedFunction> resourceRegistry = new HashMap<>();
+    private static Map<String, Service> serviceRegistry = new HashMap<>();
+    private static Map<String, Resource> resourceRegistry = new HashMap<>();
     private static Resource onMessageResource;
     private static Resource onErrorResource;
-    private static AttachedFunction onMessageAttachedFunction;
-    private static AttachedFunction onErrorAttachedFunction;
     private static DefaultStompClient client;
 
-    public static void execute(MapValue<String, Object> dispatcherConfig) {
-//        BMap<String, BValue> connection = (BMap<String, BValue>) context.getRefArgument(0);
+    public static void execute(Context context) {
+        BMap<String, BValue> connection = (BMap<String, BValue>) context.getRefArgument(0);
         // Get stompClient object created in intListener.
         DefaultStompClient stompClient = (DefaultStompClient)
-                dispatcherConfig.getNativeData(StompConstants.CONFIG_FIELD_CLIENT_OBJ);
+                connection.getNativeData(StompConstants.CONFIG_FIELD_CLIENT_OBJ);
         StompDispatcher.client = stompClient;
     }
 
-    public static void registerService(ObjectValue service, String destination) {
+    public static void registerService(Service service, String destination) {
        serviceRegistry.put(destination, service);
     }
 
@@ -60,20 +54,20 @@ public class StompDispatcher {
         return serviceRegistry;
     }
 
-    public static void extractResource(ObjectValue service) {
+    public static void extractResource(Service service) {
         int count;
-        if (service.getType().getAttachedFunctions().length == 2) {
-            for (count = 0; count < service.getType().getAttachedFunctions().length; count++) {
+        if (service.getResources().length == 2) {
+            for (count = 0; count < service.getResources().length; count++) {
                 // Accessing each element of array
-                String resourceName = service.getType().getAttachedFunctions()[count].getName();
+                String resourceName = service.getResources()[count].getName();
                 if (resourceName.equals("onMessage")) {
-                    onMessageAttachedFunction = service.getType().getAttachedFunctions()[count];
-                    resourceRegistry.put("onMessage", onMessageAttachedFunction);
+                    onMessageResource = service.getResources()[count];
+                    resourceRegistry.put("onMessage", onMessageResource);
                 }
 
                 if (resourceName.equals("onError")) {
-                    onErrorAttachedFunction = service.getType().getAttachedFunctions()[count];
-                    resourceRegistry.put("onError", onErrorAttachedFunction);
+                    onErrorResource = service.getResources()[count];
+                    resourceRegistry.put("onError", onErrorResource);
                 }
             }
         } else {
@@ -82,21 +76,16 @@ public class StompDispatcher {
     }
 
     public static void executeOnMessage(String messageId, String body, String destination, String replyToDestination) {
-        ObjectValue service = serviceRegistry.get(destination);
+        Service service = serviceRegistry.get(destination);
         extractResource(service);
-        onMessageAttachedFunction = resourceRegistry.get("onMessage");
+        onMessageResource = resourceRegistry.get("onMessage");
 
-        ArrayValue annotations = service.getType().getAnnotation(StompConstants.STOMP_PACKAGE,
-                StompConstants.SERVICE_CONFIG);
-        MapValue<String, Object> messageConfig = (MapValue) annotations.getRefValue(0);
-        String ackMode = messageConfig.getStringValue(StompConstants.CONFIG_FIELD_ACKMODE);
+        Annotation serviceAnnotation = getServiceConfigAnnotation(service);
+        Struct annotationValue = serviceAnnotation.getValue();
+        String ackMode = annotationValue.getStringField(StompConstants.CONFIG_FIELD_ACKMODE);
 
-        if (onMessageAttachedFunction != null) {
-
-            Executor.submit(service, RabbitMQConstants.FUNC_ON_MESSAGE, new RabbitMQResourceCallback(countDownLatch),
-                    null, getMessageObjectValue(message, deliveryTag, properties));
-
-            ProgramFile programFile = onMessageAttachedFunction.getResourceInfo().getPackageInfo().getProgramFile();
+        if (onMessageResource != null) {
+            ProgramFile programFile = onMessageResource.getResourceInfo().getPackageInfo().getProgramFile();
             BMap<String, BValue> msgObj = BLangConnectorSPIUtil.createBStruct(programFile,
                     StompConstants.STOMP_PACKAGE, StompConstants.MESSAGE_OBJ);
             List<ParamDetail> paramDetails = onMessageResource.getParamDetails();
@@ -125,22 +114,6 @@ public class StompDispatcher {
         }
     }
 
-    private ObjectValue getMessageObjectValue(byte[] message, long deliveryTag, AMQP.BasicProperties properties) {
-        ObjectValue messageObjectValue = BallerinaValues.createObjectValue(RabbitMQConstants.PACKAGE_RABBITMQ,
-                RabbitMQConstants.MESSAGE_OBJECT);
-        messageObjectValue.addNativeData(RabbitMQConstants.DELIVERY_TAG, deliveryTag);
-        messageObjectValue.addNativeData(RabbitMQConstants.CHANNEL_NATIVE_OBJECT, channel);
-        messageObjectValue.addNativeData(RabbitMQConstants.MESSAGE_CONTENT, message);
-        messageObjectValue.addNativeData(RabbitMQConstants.AUTO_ACK_STATUS, autoAck);
-        if (!Objects.isNull(rabbitMQTransactionContext)) {
-            messageObjectValue.addNativeData(RabbitMQConstants.RABBITMQ_TRANSACTION_CONTEXT,
-                    rabbitMQTransactionContext);
-        }
-        messageObjectValue.addNativeData(RabbitMQConstants.BASIC_PROPERTIES, properties);
-        messageObjectValue.addNativeData(RabbitMQConstants.MESSAGE_ACK_STATUS, false);
-        return messageObjectValue;
-    }
-
     private static class ResponseCallback implements CallableUnitCallback {
         @Override
         public void notifySuccess() {
@@ -154,7 +127,7 @@ public class StompDispatcher {
     }
 
     public static void executeOnError(String message, String description) {
-        onErrorAttachedFunction = resourceRegistry.get("onError");
+        onErrorResource = resourceRegistry.get("onError");
         ProgramFile programFile = onErrorResource.getResourceInfo().getPackageInfo().getProgramFile();
         BMap<String, BValue> messageObj = BLangConnectorSPIUtil.createBStruct(
                 programFile, StompConstants.STOMP_PACKAGE, StompConstants.MESSAGE_OBJ);

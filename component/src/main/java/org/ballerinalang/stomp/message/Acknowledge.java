@@ -16,21 +16,18 @@
  * under the License.
  */
 
-package org.ballerinalang.stomp.message;
+package org.ballerinalang.stdlib.stomp.message;
 
 import org.ballerinalang.bre.Context;
 import org.ballerinalang.bre.bvm.CallableUnitCallback;
-import org.ballerinalang.jvm.Strand;
-import org.ballerinalang.jvm.values.MapValue;
-import org.ballerinalang.jvm.values.ObjectValue;
 import org.ballerinalang.model.NativeCallableUnit;
 import org.ballerinalang.model.types.TypeKind;
 import org.ballerinalang.model.values.BMap;
 import org.ballerinalang.model.values.BValue;
 import org.ballerinalang.natives.annotations.BallerinaFunction;
 import org.ballerinalang.natives.annotations.Receiver;
-import org.ballerinalang.stomp.StompConstants;
-import org.ballerinalang.stomp.StompUtils;
+import org.ballerinalang.stdlib.stomp.StompConstants;
+import org.ballerinalang.stdlib.stomp.StompUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,19 +50,11 @@ public class Acknowledge implements NativeCallableUnit {
 
     @Override
     public void execute(Context context, CallableUnitCallback callback) {
-
-    }
-
-    public static void Acknowledge(Strand strand, ObjectValue connectionObjectValue, MapValue<String,
-            Object> message){
-//        BMap<String, BValue> message = (BMap<String, BValue>) context.getRefArgument(0);
+        BMap<String, BValue> message = (BMap<String, BValue>) context.getRefArgument(0);
         DefaultStompClient client = (DefaultStompClient)
                 message.getNativeData(StompConstants.CONFIG_FIELD_CLIENT_OBJ);
-
-//        String login = endpointConfig.getStringValue(StompConstants.CONFIG_FIELD_LOGIN);
-
-        String ackMode = message.getStringValue(StompConstants.ACK_MODE);
-        String messageId = message.getStringValue(StompConstants.MSG_ID);
+        String ackMode = String.valueOf(message.get(StompConstants.ACK_MODE));
+        BValue messageId = message.get(StompConstants.MSG_ID);
 
         if (ackMode.equals(StompConstants.ACK_CLIENT) || ackMode.equals(StompConstants.ACK_CLIENT_INDIVIDUAL)) {
             try {

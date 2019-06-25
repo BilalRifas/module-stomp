@@ -1,4 +1,4 @@
-package org.ballerinalang.stomp.message;
+package org.ballerinalang.stdlib.stomp.message;
 
 import org.ballerinalang.util.exceptions.BallerinaException;
 import org.slf4j.Logger;
@@ -40,54 +40,8 @@ public abstract class StompListener {
     public abstract void onCriticalError(Exception e);
 
     public void durableConnect(String durableId) {
-        try {
-            // Connecting to STOMP broker.
-            if (connectionUri.getScheme().equals("tcp")) {
-                socketConnection = new Socket(this.connectionUri.getHost(), this.connectionUri.getPort());
-            } else if (connectionUri.getScheme().equals("tcps")) {
-                SocketFactory socketFactory = SSLSocketFactory.getDefault();
-                socketConnection = socketFactory.createSocket(
-                        this.connectionUri.getHost(), this.connectionUri.getPort());
-            } else {
-                throw new StompException("Library is not support this scheme");
-            }
-
-            // Initialize reader thread.
-            readerThread = new Thread(new Runnable() {
-                public void run() {
-                    reader();
-                }
-            });
-
-            // Start reader thread.
-            readerThread.start();
-
-            // Sending CONNECT command.
-            StompFrame connectionFrame = new StompFrame(StompCommand.CONNECT);
-            if (connectionUri.getUserInfo() != null) {
-                String[] credentials = connectionUri.getUserInfo().split(":");
-                if (credentials.length == 2) {
-                    connectionFrame.header.put("login", credentials[0]);
-                    connectionFrame.header.put("passcode", credentials[1]);
-                }
-            }
-            connectionFrame.header.put("client-id", this.durableConnectId);
-            sendFrame(connectionFrame);
-
-            // Wait for CONNECTED broker command.
-            synchronized (this) {
-                wait();
-            }
-
-        } catch (BallerinaException ex) {
-            ex.initCause(ex);
-        } catch (Exception e) {
-            try {
-                throw e;
-            } catch (IOException | InterruptedException ex) {
-                ex.initCause(ex);
-            }
-        }
+        this.durableConnectId = durableId;
+        this.durableFlag = true;
     }
 
     public void connect() {
@@ -121,6 +75,9 @@ public abstract class StompListener {
                     connectionFrame.header.put("login", credentials[0]);
                     connectionFrame.header.put("passcode", credentials[1]);
                 }
+            }
+            if (this.durableFlag) {
+                connectionFrame.header.put("client-id", this.durableConnectId);
             }
             sendFrame(connectionFrame);
 

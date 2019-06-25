@@ -16,19 +16,16 @@
  * under the License.
  */
 
-package org.ballerinalang.stomp.externimpl.consumer;
+package org.ballerinalang.stdlib.stomp.externimpl.consumer;
 
 import org.ballerinalang.bre.Context;
 import org.ballerinalang.bre.bvm.BlockingNativeCallableUnit;
-import org.ballerinalang.jvm.Strand;
-import org.ballerinalang.jvm.values.MapValue;
-import org.ballerinalang.jvm.values.ObjectValue;
 import org.ballerinalang.model.types.TypeKind;
 import org.ballerinalang.model.values.BMap;
 import org.ballerinalang.model.values.BValue;
 import org.ballerinalang.natives.annotations.BallerinaFunction;
 import org.ballerinalang.natives.annotations.Receiver;
-import org.ballerinalang.stomp.StompConstants;
+import org.ballerinalang.stdlib.stomp.StompConstants;
 
 import java.util.concurrent.CountDownLatch;
 /**
@@ -46,18 +43,12 @@ import java.util.concurrent.CountDownLatch;
 public class Stop extends BlockingNativeCallableUnit {
     @Override
     public void execute(Context context) {
-
-    }
-
-    public void Stop(Strand strand, ObjectValue connectionObjectValue, MapValue<String,
-            Object> listenerObj){
-//        BMap<String, BValue> listenerObj = (BMap<String, BValue>) context.getRefArgument(0);
+        BMap<String, BValue> listenerObj = (BMap<String, BValue>) context.getRefArgument(0);
         CountDownLatch countDownLatch =
                 (CountDownLatch) listenerObj.getNativeData(StompConstants.COUNTDOWN_LATCH);
         if (countDownLatch != null) {
             countDownLatch.countDown();
         }
-//        context.setReturnValues();
-        return;
+        context.setReturnValues();
     }
 }

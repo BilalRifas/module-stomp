@@ -30,14 +30,14 @@ fi
 ballerina_lib_location=$ballerina_home/bre/lib
 ballerina_balo_location=$ballerina_home/lib/repo
 version=${project.version}
-module_name=kafka
-fileNamePattern="wso2-kafka-*-*.*.*.jar"
+module_name=stomp
+fileNamePattern="wso2-stomp-*-*.*.*.jar"
 
 for filename in $ballerina_home/bre/lib/*; do
     existingFile=${filename##*/}
     [[ $existingFile == $fileNamePattern ]] && file=$existingFile || file=""
     if [ "$file" != "" ]; then
-        echo "[WARNING] Another version of Kafka module is already installed."
+        echo "[WARNING] Another version of Stomp module is already installed."
         read -r -p "Do you want to uninstall the previous version and continue installation? (Y/N): " response
         if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
 
@@ -56,10 +56,10 @@ for filename in $ballerina_home/bre/lib/*; do
                 echo "Please manually delete $ballerina_balo_location/wso2/$module_name/0.0.0 directory"
                 exit 2
             else
-                echo "[INFO] Successfully uninstalled existing Kafka module: $existingFile"
+                echo "[INFO] Successfully uninstalled existing Stomp module: $existingFile"
             fi
         elif [[ $response =~ ^([nN][oO]|[nN])$ ]]; then
-            echo "[ERROR] Another version of Kafka module already exists. Please remove it before install another version."
+            echo "[ERROR] Another version of Stomp module already exists. Please remove it before install another version."
             exit 1
         else
             echo "[ERROR] Invalid option provided."
@@ -108,5 +108,5 @@ else
     if [ -e "temp/wso2-$module_name-module-$version.jar" ]; then
         rm -r temp
     fi
-    echo "[INFO] Successfully installed Kafka module: wso2-$module_name-module-$version!"
+    echo "[INFO] Successfully installed Stomp module: wso2-$module_name-module-$version!"
 fi

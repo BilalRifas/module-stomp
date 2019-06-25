@@ -1,4 +1,4 @@
-package org.ballerinalang.stomp.message;
+package org.ballerinalang.stdlib.stomp.message;
 
 /**
  * Each Stomp commands.

@@ -16,13 +16,10 @@
  * under the License.
  */
 
-package org.ballerinalang.stomp.externimpl.consumer;
+package org.ballerinalang.stdlib.stomp.externimpl.consumer;
 
 import org.ballerinalang.bre.Context;
 import org.ballerinalang.bre.bvm.BlockingNativeCallableUnit;
-import org.ballerinalang.jvm.Strand;
-import org.ballerinalang.jvm.values.MapValue;
-import org.ballerinalang.jvm.values.ObjectValue;
 import org.ballerinalang.model.types.TypeKind;
 import org.ballerinalang.model.values.BInteger;
 import org.ballerinalang.model.values.BMap;
@@ -30,9 +27,9 @@ import org.ballerinalang.model.values.BString;
 import org.ballerinalang.model.values.BValue;
 import org.ballerinalang.natives.annotations.BallerinaFunction;
 import org.ballerinalang.natives.annotations.Receiver;
-import org.ballerinalang.stomp.StompConstants;
-import org.ballerinalang.stomp.StompUtils;
-import org.ballerinalang.stomp.message.DefaultStompClient;
+import org.ballerinalang.stdlib.stomp.StompConstants;
+import org.ballerinalang.stdlib.stomp.StompUtils;
+import org.ballerinalang.stdlib.stomp.message.DefaultStompClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,36 +58,35 @@ public class InitListener extends BlockingNativeCallableUnit {
 
     @Override
     public void execute(Context context) {
-
-    }
-
-    public static void InitListener (Strand strand, ObjectValue connectionObjectValue, MapValue<String,
-            Object> connectionConfig) {
         try {
-            validateURI(connectionConfig);
+            BMap<String, BValue> connection = (BMap<String, BValue>) context.getRefArgument(0);
+
+            this.validateURI(context);
             String connectionURI = "tcp://" + InitListener.userLogin + ":" + InitListener.userPasscode +
                     "@" + InitListener.hostName + ":" + InitListener.stompPort;
 
             DefaultStompClient client = new DefaultStompClient(new URI(connectionURI));
-            connectionConfig.addNativeData(StompConstants.CONFIG_FIELD_CLIENT_OBJ, client);
+            connection.addNativeData(StompConstants.CONFIG_FIELD_CLIENT_OBJ, client);
 
-//            context.setReturnValues();
+            context.setReturnValues();
         } catch (URISyntaxException e) {
             context.setReturnValues(StompUtils.getError(context, e));
         }
     }
 
-    private static void validateURI(MapValue<String, Object> endpointConfig) {
-        String login = endpointConfig.getStringValue(StompConstants.CONFIG_FIELD_LOGIN);
-        InitListener.userLogin = login;
+    private void validateURI(Context context) {
+        BMap<String, BValue> endpointConfig = (BMap<String, BValue>) context.getRefArgument(1);
 
-        String passcode = endpointConfig.getStringValue(StompConstants.CONFIG_FIELD_PASSCODE);
-        InitListener.userPasscode = passcode;
+        BString login = (BString) endpointConfig.get(StompConstants.CONFIG_FIELD_LOGIN);
+        InitListener.userLogin = String.valueOf(login);
 
-        String host = endpointConfig.getStringValue(StompConstants.CONFIG_FIELD_HOST);
-        InitListener.hostName = host;
+        BString passcode = (BString) endpointConfig.get(StompConstants.CONFIG_FIELD_PASSCODE);
+        InitListener.userPasscode = String.valueOf(passcode);
 
-        int port = Math.toIntExact(endpointConfig.getIntValue(StompConstants.CONFIG_FIELD_PORT));
-        InitListener.stompPort = port;
+        BString host = (BString) endpointConfig.get(StompConstants.CONFIG_FIELD_HOST);
+        InitListener.hostName = String.valueOf(host);
+
+        BInteger port = (BInteger) endpointConfig.get(StompConstants.CONFIG_FIELD_PORT);
+        InitListener.stompPort = Integer.parseInt(String.valueOf(port));
     }
 }
