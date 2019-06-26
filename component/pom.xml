@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.ballerinalang</groupId>
         <artifactId>ballerina-stomp-parent</artifactId>
-        <version>0.991.0</version>
+        <version>0.991.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -258,7 +258,7 @@
                         </goals>
                         <configuration>
                             <outputDir>${project.build.directory}/api-docs</outputDir>
-                            <sourceRoot>${basedir}/src/main/ballerina</sourceRoot>
+                            <sourceRoot>${basedir}/src/main/wso2</sourceRoot>
                             <nativeCode>true</nativeCode>
                             <packageFilter>compression</packageFilter>
                             <orgName>wso2</orgName>
@@ -414,7 +414,7 @@
                             </systemProperties>
                             <arguments>
                                 <argument>false</argument>
-                                <argument>${basedir}/src/main/ballerina/</argument>
+                                <argument>${basedir}/src/main/wso2/</argument>
                                 <argument>${project.build.directory}/generated-balo/repo/wso2</argument>
                                 <argument>${project.build.directory}</argument>
                                 <argument>${project.version}</argument>

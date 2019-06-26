@@ -39,7 +39,7 @@ for filename in $ballerina_home/bre/lib/*; do
     if [ "$file" != "" ]; then
         echo "[WARNING] Another version of Stomp module is already installed."
         read -r -p "Do you want to uninstall the previous version and continue installation? (Y/N): " response
-        if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
+        if [[ $response =~ "yes" || $response = "y" ]]; then
 
             rm $ballerina_lib_location/$existingFile
 
@@ -58,7 +58,7 @@ for filename in $ballerina_home/bre/lib/*; do
             else
                 echo "[INFO] Successfully uninstalled existing Stomp module: $existingFile"
             fi
-        elif [[ $response =~ ^([nN][oO]|[nN])$ ]]; then
+        elif [[ $response =~ "no" || $response = "n" ]]; then
             echo "[ERROR] Another version of Stomp module already exists. Please remove it before install another version."
             exit 1
         else
