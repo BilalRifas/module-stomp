@@ -7,9 +7,9 @@ This connector is compatible with Stomp 1.2 version.
 
 ## Compatibility
 
-| Ballerina Language Version  | Google Tasks API Version |
+| Ballerina Language Version  | Stomp Protocol Version   | 
 |:---------------------------:|:------------------------:|
-| 0.991.0                     | v1                       |
+| 0.991.0                     | 1.2                      |
 
 ## Getting started
 

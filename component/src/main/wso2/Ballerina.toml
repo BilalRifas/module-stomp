@@ -1,3 +1,7 @@
 [project]
-org-name = "ballerina"
-version = "0.0.0"
+org-name = "bilal"
+version = "0.1.0"
+authors = ["Bilal Rifas"]
+keywords = ["stomp protocol", "stomp", "ballerina", "protocol"]
+repository = "https://github.com/BilalRifas/module-stomp"
+license = "Apache-2.0"
