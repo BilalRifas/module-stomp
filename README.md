@@ -4,6 +4,17 @@
 Ballerina Stomp Client Endpoint is used to connect Ballerina with STOMP specific Brokers. With this Stomp Client, Ballerina can act as Stomp Consumers and Stomp Producers.
 This connector is compatible with Stomp 1.2 version.
 
+
+## Compatibility
+
+| Ballerina Language Version  | Google Tasks API Version |
+|:---------------------------:|:------------------------:|
+| 0.991.0                     | v1                       |
+
+## Getting started
+
+> Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide to download and install Ballerina.
+
 ## Ballerina as a Stomp Consumer
 
 Following is a simple service (stompService) which is subscribed to queue 'test-stomp' on remote Stomp specific broker. In this example, acknowledgement is done automatically inside the resource by setting property `ackMode: stomp:AUTO` at service config.
